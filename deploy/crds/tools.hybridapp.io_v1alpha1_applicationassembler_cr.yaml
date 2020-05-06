@@ -2,6 +2,15 @@ apiVersion: tools.hybridapp.io/v1alpha1
 kind: ApplicationAssembler
 metadata:
   name: example-applicationassembler
+  labels:
+    app.kubernetes.io/instance: ham-application-assembler
+    app.kubernetes.io/managed-by: ham-application-assembler
+    app.kubernetes.io/name: hybridApplicationModel
 spec:
-  # Add fields here
-  size: 3
+  applicationObject:
+    name: simple
+  components:
+  - apiVersion: app.cp4mcm.ibm.com/v1alpha1
+    kind: Deployable
+    name: db2
+    namespace: raleigh

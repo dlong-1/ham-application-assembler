@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ham-application-assembler
+  labels:
+    app.kubernetes.io/instance: ham-application-assembler
+    app.kubernetes.io/managed-by: ham-application-assembler
+    app.kubernetes.io/name: hybridApplicationModel
 spec:
   replicas: 1
   selector:
@@ -11,23 +15,70 @@ spec:
     metadata:
       labels:
         name: ham-application-assembler
+        app.kubernetes.io/instance: ham-application-assembler
+        app.kubernetes.io/managed-by: ham-application-assembler
+        app.kubernetes.io/name: hybridApplicationModel
+      annotations:
+        productID: 0123456789abcdef0123456789abcdef
+        productName: some-name
+        productVersion: v1.0.0
     spec:
       serviceAccountName: ham-application-assembler
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - ppc64le
+                      - s390x
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
       containers:
         - name: ham-application-assembler
           # Replace this with the built image name
-          image: REPLACE_IMAGE
+          image: quay.io/hybridappio/ham-application-assembler@sha256:7251ab560110fb3cca1377344fab802b12be346f29d447026246592fa37244bf
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1001
           command:
-          - ham-application-assembler
+            - ham-application-assembler
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+              value: ""
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "ham-application-assembler"
+          livenessProbe:
+            exec:
+              command:
+                - ls
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+                - ls
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi

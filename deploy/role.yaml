@@ -3,6 +3,10 @@ kind: Role
 metadata:
   creationTimestamp: null
   name: ham-application-assembler
+  labels:
+    app.kubernetes.io/instance: ham-application-assembler
+    app.kubernetes.io/managed-by: ham-application-assembler
+    app.kubernetes.io/name: hybridApplicationModel
 rules:
 - apiGroups:
   - ""

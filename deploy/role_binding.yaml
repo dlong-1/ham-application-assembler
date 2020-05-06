@@ -2,6 +2,10 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: ham-application-assembler
+  labels:
+    app.kubernetes.io/instance: ham-application-assembler
+    app.kubernetes.io/managed-by: ham-application-assembler
+    app.kubernetes.io/name: hybridApplicationModel
 subjects:
 - kind: ServiceAccount
   name: ham-application-assembler
