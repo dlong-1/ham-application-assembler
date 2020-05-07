@@ -19,9 +19,10 @@ spec:
         app.kubernetes.io/managed-by: ham-application-assembler
         app.kubernetes.io/name: hybridApplicationModel
       annotations:
-        productID: 0123456789abcdef0123456789abcdef
-        productName: some-name
-        productVersion: v1.0.0
+#        productID: 0123456789abcdef0123456789abcdef
+        productName: Hybrid Application Model
+        productVersion: "0.1.0"
+        productMetric: FREE
     spec:
       serviceAccountName: ham-application-assembler
       affinity:
@@ -41,7 +42,7 @@ spec:
       containers:
         - name: ham-application-assembler
           # Replace this with the built image name
-          image: quay.io/hybridappio/ham-application-assembler@sha256:7251ab560110fb3cca1377344fab802b12be346f29d447026246592fa37244bf
+          image: quay.io/hybridappio/ham-application-assembler:latest
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
