@@ -1,0 +1,245 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "tools.hybridapp.io/v1alpha1",
+          "kind": "ApplicationAssembler",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "ham-application-assembler",
+              "app.kubernetes.io/managed-by": "ham-application-assembler",
+              "app.kubernetes.io/name": "hybridApplicationModel"
+            },
+            "name": "example-applicationassembler"
+          },
+          "spec": {
+            "applicationObject": {
+              "name": "simple"
+            },
+            "components": [
+              {
+                "apiVersion": "app.cp4mcm.ibm.com/v1alpha1",
+                "kind": "Deployable",
+                "name": "db2",
+                "namespace": "raleigh"
+              }
+            ]
+          }
+        }
+      ]
+    capabilities: Basic Install
+  name: ham-application-assembler.v0.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: ApplicationAssembler is the Schema for the applicationassemblers
+        API
+      kind: ApplicationAssembler
+      name: applicationassemblers.tools.hybridapp.io
+      version: v1alpha1
+  displayName: Ham Application Assembler
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments:
+      - name: ham-application-assembler
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: ham-application-assembler
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                productMetric: FREE
+                productName: Hybrid Application Model
+                productVersion: 0.1.0
+              labels:
+                app.kubernetes.io/instance: ham-application-assembler
+                app.kubernetes.io/managed-by: ham-application-assembler
+                app.kubernetes.io/name: hybridApplicationModel
+                name: ham-application-assembler
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - ppc64le
+                        - s390x
+              containers:
+              - command:
+                - ham-application-assembler
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: ham-application-assembler
+                image: quay.io/hybridappio/ham-application-assembler:latest
+                imagePullPolicy: Always
+                livenessProbe:
+                  exec:
+                    command:
+                    - ls
+                  initialDelaySeconds: 15
+                  periodSeconds: 15
+                name: ham-application-assembler
+                readinessProbe:
+                  exec:
+                    command:
+                    - ls
+                  initialDelaySeconds: 15
+                  periodSeconds: 15
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 512Mi
+                  requests:
+                    cpu: 25m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  privileged: false
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+                  runAsUser: 1001
+              serviceAccountName: ham-application-assembler
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - ham-application-assembler
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - replicasets
+          - deployments
+          verbs:
+          - get
+        - apiGroups:
+          - app.cp4mcm.ibm.com
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - core.hybridapp.io
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - tools.hybridapp.io
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: ham-application-assembler
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ""
+  maintainers:
+  - {}
+  maturity: alpha
+  provider: {}
+  version: 0.1.0
